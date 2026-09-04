@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#081a2b">
+    <meta name="description" content="Consulta el tipo de cambio de referencia del dólar estadounidense frente al peso mexicano, revisa su tendencia y convierte importes.">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://api.frankfurter.dev; img-src 'self'; style-src 'self'; script-src 'self'; base-uri 'self'; form-action 'none';">
+    <title>Dólar MX — USD a MXN</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="Dólar MX, inicio">
+        <span class="brand-mark" aria-hidden="true">$</span>
+        <span>Dólar MX</span>
+      </a>
+      <button class="refresh-button" id="refresh-button" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6v5h-5M4 18v-5h5M18.5 9A7 7 0 0 0 6.7 6.7L4 11M20 13l-2.7 4.3A7 7 0 0 1 5.5 15"/></svg>
+        <span>Actualizar</span>
+      </button>
+    </header>
+
+    <main>
+      <section class="rate-panel" aria-labelledby="page-title">
+        <div class="rate-copy">
+          <p class="eyebrow">Dólar estadounidense · Peso mexicano</p>
+          <h1 id="page-title">Tipo de cambio USD/MXN</h1>
+          <div class="rate-line" aria-live="polite" aria-atomic="true">
+            <span class="currency-prefix">$</span>
+            <span class="current-rate" id="current-rate">—</span>
+            <span class="currency-code">MXN</span>
+          </div>
+          <div class="rate-meta">
+            <span class="change neutral" id="rate-change">Esperando datos</span>
+            <span class="date" id="rate-date">Último día hábil disponible</span>
+          </div>
+        </div>
+        <div class="market-status" id="market-status">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="status-text">Consultando la fuente…</span>
+        </div>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="card converter-card">
+          <div class="card-heading">
+            <div>
+              <p class="kicker">Conversor</p>
+              <h2>Calcula un importe</h2>
+            </div>
+            <button class="swap-button" id="swap-button" type="button" aria-label="Invertir monedas" title="Invertir monedas">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 3-3m-3 3 3 3M17 17l-3 3m3-3-3-3M5 7h12M19 17H7"/></svg>
+            </button>
+          </div>
+
+          <label class="money-field" for="amount-input">
+            <span id="from-label">Dólares estadounidenses</span>
+            <span class="input-row">
+              <span class="field-code" id="from-code">USD</span>
+              <input id="amount-input" type="number" inputmode="decimal" min="0" step="0.01" value="100" aria-describedby="conversion-rate-note">
+            </span>
+          </label>
+
+          <div class="conversion-result" aria-live="polite">
+            <span id="to-label">Pesos mexicanos</span>
+            <strong id="conversion-result">—</strong>
+          </div>
+          <p class="small-note" id="conversion-rate-note">La conversión usa el tipo de cambio de referencia mostrado arriba.</p>
+        </article>
+
+        <article class="card trend-card">
+          <div class="card-heading trend-heading">
+            <div>
+              <p class="kicker">Tendencia</p>
+              <h2>Comportamiento reciente</h2>
+            </div>
+            <div class="period-selector" role="group" aria-label="Periodo de la gráfica">
+              <button type="button" data-period="30" class="active" aria-pressed="true">30D</button>
+              <button type="button" data-period="90" aria-pressed="false">90D</button>
+              <button type="button" data-period="180" aria-pressed="false">6M</button>
+            </div>
+          </div>
+          <div class="chart-summary" id="chart-summary" aria-live="polite">Cargando historial…</div>
+          <div class="chart-shell" id="chart-shell">
+            <svg class="rate-chart" id="rate-chart" viewBox="0 0 720 280" role="img" aria-labelledby="chart-title chart-description">
+              <title id="chart-title">Historial del tipo de cambio USD a MXN</title>
+              <desc id="chart-description">La gráfica aparecerá cuando estén disponibles los datos.</desc>
+              <g id="chart-grid"></g>
+              <path id="chart-area" class="chart-area" d=""></path>
+              <path id="chart-line" class="chart-line" d=""></path>
+              <g id="chart-labels"></g>
+              <g id="chart-highlight"></g>
+            </svg>
+            <div class="chart-loading" id="chart-loading" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="stats-grid" aria-label="Resumen del periodo">
+        <article class="stat-card">
+          <span>Máximo</span>
+          <strong id="period-high">—</strong>
+          <small id="period-high-date">—</small>
+        </article>
+        <article class="stat-card">
+          <span>Mínimo</span>
+          <strong id="period-low">—</strong>
+          <small id="period-low-date">—</small>
+        </article>
+        <article class="stat-card">
+          <span>Promedio</span>
+          <strong id="period-average">—</strong>
+          <small id="period-label">Últimos 30 días</small>
+        </article>
+      </section>
+
+      <section class="reference-note" aria-labelledby="source-title">
+        <div class="info-icon" aria-hidden="true">i</div>
+        <div>
+          <h2 id="source-title">Tipo de cambio de referencia</h2>
+          <p>Los datos provienen de <a href="https://frankfurter.dev/" target="_blank" rel="noopener noreferrer">Frankfurter</a>, que reúne tipos de cambio de proveedores públicos y se actualiza cada día hábil. No corresponde al precio de compra o venta de una institución bancaria.</p>
+          <p class="update-time" id="update-time">Sin actualización local todavía.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Dólar MX</span>
+      <span>Datos informativos · Sin recomendaciones financieras</span>
+    </footer>
+    <noscript>Activa JavaScript para consultar y convertir el tipo de cambio.</noscript>
+  </body>
+</html>
